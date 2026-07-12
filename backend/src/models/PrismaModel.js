@@ -71,6 +71,7 @@ function parsePopulateFields(fields) {
 function normalizeResult(result) {
   if (Array.isArray(result)) return result.map(normalizeResult);
   if (!result || typeof result !== 'object') return result;
+  if (result instanceof Date) return result;
 
   const output = { ...result, _id: result.id };
   for (const [key, value] of Object.entries(output)) {
