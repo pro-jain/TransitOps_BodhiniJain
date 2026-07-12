@@ -2,13 +2,13 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 
 const NAV_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard', icon: '◆' },
-  { to: '/vehicles', label: 'Vehicles', icon: '▣' },
-  { to: '/drivers', label: 'Drivers', icon: '☺' },
-  { to: '/trips', label: 'Trips', icon: '→' },
-  { to: '/maintenance', label: 'Maintenance', icon: '⚙' },
-  { to: '/fuel-expense', label: 'Fuel & Expense', icon: '⛽' },
-  { to: '/reports', label: 'Reports', icon: '▤' },
+  { to: '/dashboard', label: 'Dashboard', icon: '◆', roles: ['FleetManager', 'Driver', 'SafetyOfficer', 'FinancialAnalyst'] },
+  { to: '/vehicles', label: 'Vehicles', icon: '▣', roles: ['FleetManager', 'Driver'] },
+  { to: '/drivers', label: 'Drivers', icon: '☺', roles: ['FleetManager', 'SafetyOfficer'] },
+  { to: '/trips', label: 'Trips', icon: '→', roles: ['FleetManager', 'Driver'] },
+  { to: '/maintenance', label: 'Maintenance', icon: '⚙', roles: ['FleetManager'] },
+  { to: '/fuel-expense', label: 'Fuel & Expense', icon: '⛽', roles: ['FleetManager', 'FinancialAnalyst', 'Driver'] },
+  { to: '/reports', label: 'Reports', icon: '▤', roles: ['FleetManager', 'FinancialAnalyst'] },
 ];
 
 export default function Sidebar() {
@@ -22,7 +22,7 @@ export default function Sidebar() {
       </div>
 
       <div className="nav-section-label">Operations</div>
-      {NAV_ITEMS.map((item) => (
+      {NAV_ITEMS.filter((item) => item.roles.includes(user?.role)).map((item) => (
         <NavLink
           key={item.to}
           to={item.to}

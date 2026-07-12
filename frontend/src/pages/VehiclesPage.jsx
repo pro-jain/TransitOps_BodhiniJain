@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '../auth/AuthContext.jsx';
 import Topbar from '../components/layout/Topbar.jsx';
 import Modal from '../components/common/Modal.jsx';
 import VehicleTable from '../components/vehicles/VehicleTable.jsx';
@@ -47,9 +48,14 @@ export default function VehiclesPage() {
     window.open(`${axiosClient.defaults.baseURL}/vehicles/export/csv`, '_blank');
   }
 
+  const { user } = useAuth();
+  const subtitle = user?.role === 'Driver'
+    ? 'Your assigned vehicles'
+    : 'Master list of all fleet vehicles';
+
   return (
     <>
-      <Topbar title="Vehicle Registry" subtitle="Master list of all fleet vehicles" />
+      <Topbar title="Vehicle Registry" subtitle={subtitle} />
       <div className="page-body">
         <div className="filter-bar">
           <select value={filters.type} onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}>

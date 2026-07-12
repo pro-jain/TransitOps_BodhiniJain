@@ -23,13 +23,13 @@ export default function App() {
         }
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="vehicles" element={<VehiclesPage />} />
-        <Route path="drivers" element={<DriversPage />} />
-        <Route path="trips" element={<TripsPage />} />
-        <Route path="maintenance" element={<MaintenancePage />} />
-        <Route path="fuel-expense" element={<FuelExpensePage />} />
-        <Route path="reports" element={<ReportsPage />} />
+        <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="vehicles" element={<ProtectedRoute roles={['FleetManager', 'Driver']}><VehiclesPage /></ProtectedRoute>} />
+        <Route path="drivers" element={<ProtectedRoute roles={['FleetManager', 'SafetyOfficer']}><DriversPage /></ProtectedRoute>} />
+        <Route path="trips" element={<ProtectedRoute roles={['FleetManager', 'Driver']}><TripsPage /></ProtectedRoute>} />
+        <Route path="maintenance" element={<ProtectedRoute roles={['FleetManager']}><MaintenancePage /></ProtectedRoute>} />
+        <Route path="fuel-expense" element={<ProtectedRoute roles={['FleetManager', 'FinancialAnalyst', 'Driver']}><FuelExpensePage /></ProtectedRoute>} />
+        <Route path="reports" element={<ProtectedRoute roles={['FleetManager', 'FinancialAnalyst']}><ReportsPage /></ProtectedRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
