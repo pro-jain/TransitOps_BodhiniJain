@@ -94,7 +94,7 @@ All enforced server-side in a single centralized validation layer:
 |---|---|
 | Frontend | React + Vite |
 | Backend | Node.js + Express |
-| Database | MongoDB + Mongoose |
+| Database | PostgreSQL + Prisma |
 | Auth | JWT + RBAC middleware |
 | Charts | Recharts |
 | Export | papaparse / json2csv |
@@ -108,7 +108,7 @@ transitops/
 ├── backend/
 │   └── src/
 │       ├── config/          # DB connection, env
-│       ├── models/          # Mongoose schemas
+│       ├── models/          # Prisma data adapter wrappers
 │       ├── middleware/      # auth, RBAC, error handling
 │       ├── controllers/     # request handlers
 │       ├── services/        # business logic + DSA modules
@@ -130,13 +130,13 @@ transitops/
 
 ### Prerequisites
 - Node.js ≥ 18
-- MongoDB (local or Atlas)
+- PostgreSQL
 
 ### Backend
 ```bash
 cd backend
 npm install
-cp .env.example .env    # set MONGO_URI, JWT_SECRET, PORT
+cp .env.example .env    # set DATABASE_URL, JWT_SECRET, PORT
 npm run seed             # populate demo data
 npm run dev
 ```
