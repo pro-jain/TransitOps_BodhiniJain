@@ -6,6 +6,15 @@ export async function listDrivers(req, res, next) {
     const { status } = req.query;
     const filter = {};
     if (status) filter.status = status;
+
+    if (req.user?.role === 'Driver') {
+      const driverProfile = await Driver.findOne({ userId: req.user.id });
+      if (!driverProfile) {
+        return res.json([]);
+      }
+      return res.json([driverProfile]);
+    }
+
     const drivers = await Driver.find(filter).sort({ createdAt: -1 });
     res.json(drivers);
   } catch (err) {

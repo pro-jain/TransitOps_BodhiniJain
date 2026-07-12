@@ -25,6 +25,15 @@ export async function listTrips(req, res, next) {
       end.setHours(23, 59, 59, 999);
       filter.plannedStart = { $gte: start, $lte: end };
     }
+
+    if (req.user?.role === 'Driver') {
+      const driverProfile = await Driver.findOne({ userId: req.user.id });
+      if (!driverProfile) {
+        return res.json([]);
+      }
+      filter.driverId = driverProfile._id;
+    }
+
     const trips = await Trip.find(filter)
       .populate('vehicleId', 'regNumber name')
       .populate('driverId', 'name licenseNumber')
@@ -53,8 +62,19 @@ export async function createTrip(req, res, next) {
     const { source, destination, vehicleId, driverId, cargoWeight, plannedDistance, plannedStart, plannedEnd, revenue } = req.body;
 
     const vehicle = await Vehicle.findById(vehicleId);
-    const driver = await Driver.findById(driverId);
     if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+
+    let assignedDriverId = driverId;
+    if (req.user?.role === 'Driver') {
+      const driverProfile = await Driver.findOne({ userId: req.user.id });
+      if (!driverProfile) return res.status(403).json({ message: 'Driver profile not found' });
+      if (String(driverId) !== String(driverProfile._id)) {
+        return res.status(403).json({ message: 'Driver users may only create trips for themselves' });
+      }
+      assignedDriverId = driverProfile._id;
+    }
+
+    const driver = await Driver.findById(assignedDriverId);
     if (!driver) return res.status(404).json({ message: 'Driver not found' });
 
     assertCargoWithinCapacity(cargoWeight, vehicle);
@@ -63,7 +83,7 @@ export async function createTrip(req, res, next) {
       source,
       destination,
       vehicleId,
-      driverId,
+      driverId: assignedDriverId,
       cargoWeight,
       plannedDistance,
       plannedStart,

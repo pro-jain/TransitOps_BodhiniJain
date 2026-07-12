@@ -1,4 +1,6 @@
 import Vehicle from '../models/Vehicle.model.js';
+import Trip from '../models/Trip.model.js';
+import Driver from '../models/Driver.model.js';
 import { assertVehicleRegNumberUnique } from '../services/validation.service.js';
 import { sendCsv } from '../utils/csvExport.js';
 
@@ -9,6 +11,19 @@ export async function listVehicles(req, res, next) {
     if (type) filter.type = type;
     if (status) filter.status = status;
     if (region) filter.region = region;
+
+    if (req.user?.role === 'Driver') {
+      const driverProfile = await Driver.findOne({ userId: req.user.id });
+      if (!driverProfile) {
+        return res.json([]);
+      }
+      const vehicleIds = await Trip.distinct('vehicleId', { driverId: driverProfile._id });
+      if (vehicleIds.length === 0) {
+        return res.json([]);
+      }
+      filter._id = { $in: vehicleIds };
+    }
+
     const vehicles = await Vehicle.find(filter).sort({ createdAt: -1 });
     res.json(vehicles);
   } catch (err) {

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const driverSchema = new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     name: { type: String, required: true, trim: true },
     licenseNumber: { type: String, required: true, unique: true, trim: true },
     licenseCategory: { type: String, required: true, trim: true },

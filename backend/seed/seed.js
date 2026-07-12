@@ -79,7 +79,7 @@ async function seed() {
 
   // ---- Drivers ----
   const driverDefs = [
-    { name: 'Alex Carter', licenseNumber: 'DL-1001', licenseCategory: 'LMV', licenseExpiry: daysFromNow(400), contact: '9990001', safetyScore: 92, status: 'Available' },
+    { userId: users[1]._id, name: 'Alex Carter', licenseNumber: 'DL-1001', licenseCategory: 'LMV', licenseExpiry: daysFromNow(400), contact: '9990001', safetyScore: 92, status: 'Available' },
     { name: 'Meera Nair', licenseNumber: 'DL-1002', licenseCategory: 'HMV', licenseExpiry: daysFromNow(20), contact: '9990002', safetyScore: 88, status: 'Available' },
     { name: 'Sanjay Rao', licenseNumber: 'DL-1003', licenseCategory: 'HMV', licenseExpiry: daysFromNow(-10), contact: '9990003', safetyScore: 75, status: 'Available' }, // expired
     { name: 'Divya Kapoor', licenseNumber: 'DL-1004', licenseCategory: 'LMV', licenseExpiry: daysFromNow(200), contact: '9990004', safetyScore: 95, status: 'Available' },
