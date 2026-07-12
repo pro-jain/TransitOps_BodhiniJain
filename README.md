@@ -190,10 +190,3 @@ After seeding, use the credentials printed by `npm run seed` (one account per ro
 - **Bodhini Jain** 
 - **Kartikeya Jain** 
 
-
-
----
-
-## 📄 License
-
-This project was built for hackathon evaluation purposes. Add a license (MIT recommended) if open-sourcing beyond the event.
