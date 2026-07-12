@@ -26,8 +26,7 @@ export async function createMaintenanceLog(req, res, next) {
     }
 
     const log = await MaintenanceLog.create({ vehicleId, type, cost: cost || 0, isActive: true });
-    vehicle.status = 'In Shop';
-    await vehicle.save();
+    await Vehicle.findByIdAndUpdate(vehicleId, { status: 'In Shop' });
 
     res.status(201).json(log);
   } catch (err) {
@@ -42,16 +41,18 @@ export async function closeMaintenanceLog(req, res, next) {
     if (!log) return res.status(404).json({ message: 'Maintenance log not found' });
     assertMaintenanceClosable(log);
 
-    log.isActive = false;
-    log.closedAt = new Date();
-    if (req.body.cost !== undefined) log.cost = req.body.cost;
-    await log.save();
+    const updatedLog = await MaintenanceLog.findByIdAndUpdate(req.params.id, {
+      isActive: false,
+      closedAt: new Date(),
+      ...(req.body.cost !== undefined ? { cost: req.body.cost } : {}),
+    });
 
-    const vehicle = await Vehicle.findById(log.vehicleId);
+    const vehicle = await Vehicle.findById(updatedLog.vehicleId);
     if (vehicle && vehicle.status !== 'Retired') {
-      vehicle.status = 'Available';
-      await vehicle.save();
+      await Vehicle.findByIdAndUpdate(vehicle.id, { status: 'Available' });
     }
+
+    res.json({ log: updatedLog, vehicle });
 
     res.json({ log, vehicle });
   } catch (err) {

@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
 import { env } from './env.js';
+import { prisma } from '../prisma/client.js';
 
 export async function connectDB() {
-  mongoose.set('strictQuery', true);
-  await mongoose.connect(env.mongoUri);
-  console.log('[db] connected to MongoDB');
+  await prisma.$connect();
+  console.log('[db] connected to PostgreSQL');
 }

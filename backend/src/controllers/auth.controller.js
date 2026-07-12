@@ -49,11 +49,11 @@ export async function me(req, res, next) {
 }
 
 function signToken(user) {
-  return jwt.sign({ id: user._id, role: user.role, name: user.name }, env.jwtSecret, {
+  return jwt.sign({ id: user.id, role: user.role, name: user.name }, env.jwtSecret, {
     expiresIn: env.jwtExpiresIn,
   });
 }
 
 function sanitize(user) {
-  return { id: user._id, name: user.name, email: user.email, role: user.role };
+  return { id: user.id, name: user.name, email: user.email, role: user.role };
 }

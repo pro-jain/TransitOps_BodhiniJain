@@ -90,7 +90,7 @@ export async function createTrip(req, res, next) {
       plannedEnd,
       revenue: revenue || 0,
       status: 'Draft',
-      createdBy: req.user?.id,
+      createdById: req.user?.id,
     });
 
     res.status(201).json(trip);
@@ -112,11 +112,8 @@ export async function suggestAssignment(req, res, next) {
   }
 }
 
-// NOTE: writes below are sequential (not wrapped in a Mongo multi-document
-// transaction) so this works against a standalone MongoDB instance, which
-// hackathon/demo environments typically use (transactions require a
-// replica set). If you deploy against a replica set / Atlas, wrapping
-// these in a session.withTransaction() block is a straightforward upgrade.
+// NOTE: writes below are sequential. For PostgreSQL, these can be upgraded
+// to a single Prisma transaction if stronger atomicity is required.
 export async function dispatchTrip(req, res, next) {
   try {
     const trip = await Trip.findById(req.params.id);
@@ -131,15 +128,11 @@ export async function dispatchTrip(req, res, next) {
       totalFleetSize: await Vehicle.countDocuments({ status: { $ne: 'Retired' } }),
     });
 
-    trip.status = 'Dispatched';
-    vehicle.status = 'On Trip';
-    driver.status = 'On Trip';
+    const updatedTrip = await Trip.findByIdAndUpdate(req.params.id, { status: 'Dispatched' });
+    await Vehicle.findByIdAndUpdate(vehicle.id, { status: 'On Trip' });
+    await Driver.findByIdAndUpdate(driver.id, { status: 'On Trip' });
 
-    await trip.save();
-    await vehicle.save();
-    await driver.save();
-
-    res.json({ trip, fleetWarning: overlapCheck.exceedsFleet ? overlapCheck : null });
+    res.json({ trip: updatedTrip, fleetWarning: overlapCheck.exceedsFleet ? overlapCheck : null });
   } catch (err) {
     next(err);
   }
@@ -156,31 +149,29 @@ export async function completeTrip(req, res, next) {
     const vehicle = await Vehicle.findById(trip.vehicleId);
     const driver = await Driver.findById(trip.driverId);
 
-    trip.status = 'Completed';
-    trip.actualOdometerEnd = actualOdometerEnd;
-    trip.fuelConsumed = fuelConsumed;
+    const updatedTrip = await Trip.findByIdAndUpdate(req.params.id, {
+      status: 'Completed',
+      actualOdometerEnd,
+      fuelConsumed,
+    });
 
-    vehicle.status = 'Available';
-    if (actualOdometerEnd && actualOdometerEnd > vehicle.odometer) {
-      vehicle.odometer = actualOdometerEnd;
-    }
-    driver.status = 'Available';
-
-    await trip.save();
-    await vehicle.save();
-    await driver.save();
+    await Vehicle.findByIdAndUpdate(vehicle.id, {
+      status: 'Available',
+      ...(actualOdometerEnd && actualOdometerEnd > vehicle.odometer ? { odometer: actualOdometerEnd } : {}),
+    });
+    await Driver.findByIdAndUpdate(driver.id, { status: 'Available' });
 
     if (fuelConsumed) {
       await FuelLog.create({
-        vehicleId: vehicle._id,
-        tripId: trip._id,
+        vehicleId: vehicle.id,
+        tripId: updatedTrip.id,
         liters: fuelConsumed,
         cost: fuelCost || 0,
         date: new Date(),
       });
     }
 
-    res.json({ trip });
+    res.json({ trip: updatedTrip });
   } catch (err) {
     next(err);
   }
@@ -193,15 +184,14 @@ export async function cancelTrip(req, res, next) {
     assertTripCancellable(trip);
 
     const wasDispatched = trip.status === 'Dispatched';
-    trip.status = 'Cancelled';
-    await trip.save();
+    const updatedTrip = await Trip.findByIdAndUpdate(req.params.id, { status: 'Cancelled' });
 
     if (wasDispatched) {
       await Vehicle.findByIdAndUpdate(trip.vehicleId, { status: 'Available' });
       await Driver.findByIdAndUpdate(trip.driverId, { status: 'Available' });
     }
 
-    res.json({ trip });
+    res.json({ trip: updatedTrip });
   } catch (err) {
     next(err);
   }

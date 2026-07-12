@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdTrips Trip[]  @relation("createdBy")
+}
+
+model Vehicle {
+  id              String          @id @default(uuid())
+  regNumber       String          @unique
+  name            String
+  type            String
+  region          String          @default("Unassigned")
+  maxLoadCapacity Int
+  odometer        Int             @default(0)
+  acquisitionCost Int
+  status          String          @default("Available")
+  latitude        Float?          @default(12.9716)
+  longitude       Float?          @default(77.5946)
+  speed           Int?            @default(0)
+  lastUpdated     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  trips           Trip[]
+  maintenanceLogs MaintenanceLog[]
+  fuelLogs        FuelLog[]
+  expenses        Expense[]
+}
+
+model Driver {
+  id              String   @id @default(uuid())
+  userId          String?  @unique
+  name            String
+  licenseNumber   String   @unique
+  licenseCategory String
+  licenseExpiry   DateTime
+  contact         String
+  safetyScore     Int      @default(80)
+  status          String   @default("Available")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  trips           Trip[]
+}
+
+model Trip {
+  id                String   @id @default(uuid())
+  source            String
+  destination       String
+  vehicleId         String
+  driverId          String
+  cargoWeight       Int
+  plannedDistance   Int
+  plannedStart      DateTime
+  plannedEnd        DateTime
+  actualOdometerEnd Int?
+  fuelConsumed      Int?
+  revenue           Int      @default(0)
+  status            String   @default("Draft")
+  createdById       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  vehicle           Vehicle? @relation(fields: [vehicleId], references: [id])
+  driver            Driver?  @relation(fields: [driverId], references: [id])
+  createdBy         User?    @relation("createdBy", fields: [createdById], references: [id])
+  fuelLogs          FuelLog[]
+}
+
+model MaintenanceLog {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  type       String
+  cost       Int      @default(0)
+  openedAt   DateTime @default(now())
+  closedAt   DateTime?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model FuelLog {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  tripId     String?
+  liters     Int
+  cost       Int
+  date       DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  vehicle    Vehicle @relation(fields: [vehicleId], references: [id])
+  trip       Trip?   @relation(fields: [tripId], references: [id])
+}
+
+model Expense {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  category   String
+  amount     Int
+  date       DateTime @default(now())
+  note       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  vehicle    Vehicle @relation(fields: [vehicleId], references: [id])
+}
