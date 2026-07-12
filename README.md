@@ -5,7 +5,7 @@ TransitOps is a centralized transport operations platform that replaces spreadsh
 
 ---
 
-## 📌 Problem Statement
+##  Problem Statement
 
 Many logistics operations still run on spreadsheets and manual logs, leading to:
 - Double-booked vehicles and drivers
@@ -19,7 +19,7 @@ TransitOps digitizes the full lifecycle — from vehicle registration to trip di
 
 ---
 
-## 👥 Target Users
+##  Target Users
 
 | Role | Responsibility |
 |---|---|
@@ -32,22 +32,22 @@ Access is role-based (RBAC) — each role sees and can act on only what's releva
 
 ---
 
-## ✨ Core Features
+##  Core Features
 
-- 🔐 JWT authentication with Role-Based Access Control
-- 📊 Live dashboard: Active/Available Vehicles, Vehicles in Maintenance, Active/Pending Trips, Drivers on Duty, Fleet Utilization %
-- 🚚 Vehicle registry with unique registration numbers and lifecycle status (Available / On Trip / In Shop / Retired)
-- 🧑‍✈️ Driver profiles with license tracking and status (Available / On Trip / Off Duty / Suspended)
-- 🗺️ Trip lifecycle management: Draft → Dispatched → Completed → Cancelled, with automatic status propagation to vehicle and driver
-- 🔧 Maintenance workflow that automatically pulls a vehicle out of the dispatch pool
-- ⛽ Fuel and expense logging with automatic operational cost rollups
-- 📈 Analytics: Fuel Efficiency, Fleet Utilization, Operational Cost, Vehicle ROI
-- 📤 CSV export on reports and registries
-- 🧠 Two algorithmic planning tools (below) that turn raw trip data into fleet-sizing and capacity decisions
+-  JWT authentication with Role-Based Access Control
+-  Live dashboard: Active/Available Vehicles, Vehicles in Maintenance, Active/Pending Trips, Drivers on Duty, Fleet Utilization %
+-  Vehicle registry with unique registration numbers and lifecycle status (Available / On Trip / In Shop / Retired)
+-  Driver profiles with license tracking and status (Available / On Trip / Off Duty / Suspended)
+-  Trip lifecycle management: Draft → Dispatched → Completed → Cancelled, with automatic status propagation to vehicle and driver
+-  Maintenance workflow that automatically pulls a vehicle out of the dispatch pool
+-  Fuel and expense logging with automatic operational cost rollups
+-  Analytics: Fuel Efficiency, Fleet Utilization, Operational Cost, Vehicle ROI
+-  CSV export on reports and registries
+-  Two algorithmic planning tools (below) that turn raw trip data into fleet-sizing and capacity decisions
 
 ---
 
-## 🧠 Algorithmic Core (why this isn't just CRUD)
+##  Algorithmic Core (why this isn't just CRUD)
 
 Four of the platform's decisions are backed by named algorithms instead of ad-hoc logic, because the underlying business questions are genuinely scheduling/optimization problems:
 
@@ -71,7 +71,7 @@ Two min-heaps (keyed by license expiry and maintenance due date) give the Safety
 
 ---
 
-## 🔒 Mandatory Business Rules
+##  Mandatory Business Rules
 
 All enforced server-side in a single centralized validation layer:
 
@@ -88,7 +88,7 @@ All enforced server-side in a single centralized validation layer:
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -155,7 +155,7 @@ After seeding, use the credentials printed by `npm run seed` (one account per ro
 
 ---
 
-## 🧪 Example Workflow
+##  Example Workflow
 
 1. Register vehicle `Van-05` — max capacity 500 kg, status `Available`
 2. Register driver `Alex` with a valid license
@@ -169,13 +169,13 @@ After seeding, use the credentials printed by `npm run seed` (one account per ro
 
 ---
 
-## 🗄️ Database Entities
+##  Database Entities
 
 `Users` · `Vehicles` · `Drivers` · `Trips` · `MaintenanceLogs` · `FuelLogs` · `Expenses`
 
 ---
 
-## 📊 Reports & Analytics Formulas
+##  Reports & Analytics Formulas
 
 - **Fuel Efficiency** = Distance / Fuel Consumed
 - **Fleet Utilization** = (Vehicles On Trip / Total Active Vehicles) × 100
@@ -185,7 +185,7 @@ After seeding, use the credentials printed by `npm run seed` (one account per ro
 ---
 
 
-## 👤 Team
+##  Team
 
 - **Bodhini Jain** 
 - **Kartikeya Jain** 
